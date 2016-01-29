@@ -50,7 +50,7 @@ function buddyforms_afe_admin_settings_sidebar_metabox_html(){
 }
 
  /*
-  * Create the new Form Builder Form Element for teh ACF Field Groups
+  * Create the new Form Builder Form Element for teh AFE Field Groups
   *
   */
  function buddyforms_afe_create_new_form_builder_form_element($form_fields, $form_slug, $field_type, $field_id){
@@ -73,7 +73,7 @@ function buddyforms_afe_admin_settings_sidebar_metabox_html(){
  add_filter('buddyforms_form_element_add_field','buddyforms_afe_create_new_form_builder_form_element',1,5);
 
  /*
-  * Display the new ACF Field Groups Form Element in the Frontend Form
+  * Display the new AFE Field Groups Form Element in the Frontend Form
   *
   */
  function buddyforms_afe_create_frontend_element($form, $form_args){
@@ -99,11 +99,14 @@ function buddyforms_afe_admin_settings_sidebar_metabox_html(){
           'hierarchical' => false,
         ));
         $main_cats = false;
-        foreach($categories as $key => $category){
-          $main_cats[$category->term_taxonomy_id] = $category->name;
-        }
+        if(is_array($categories)) :
+          $main_cats['none'] = 'Select One';
+          foreach($categories as $key => $category){
+            $main_cats[$category->term_taxonomy_id] = $category->name;
+          }
+        endif;
 
-        $form->addElement( new Element_Select( $customfield['name'], $customfield['slug']. '-select', $main_cats, array( 'class' => 'tax_tax_tax', 'data-id' => $id, 'data-taxonomy' => $customfield['taxonomy'] )));
+        $form->addElement( new Element_Select( $customfield['name'], $customfield['slug']. '-select', $main_cats, array('value' => $customfield_val, 'class' => 'tax_tax_tax', 'data-id' => $customfield['slug'], 'data-taxonomy' => $customfield['taxonomy'] )));
         $form->addElement( new Element_HTML('<div id="taxtax_container">'));
 
         $terms = wp_get_post_terms( $post_id, $customfield['taxonomy'] );
@@ -119,14 +122,14 @@ function buddyforms_afe_admin_settings_sidebar_metabox_html(){
 
           $term_children_array = false;
           if(is_array($term_children)) :
-            $term_children_array[none] = 'Select One';
+            $term_children_array['none'] = 'Select One';
             foreach($term_children as $key => $term_child){
                 $term_children_array[$term_child->term_taxonomy_id] = $term_child->name;
             }
           endif;
 
           if(is_array($term_children_array) && count($term_children_array) > 1){
-            $select = new Element_Select('', 'tax_tax_tax[sub][]', $term_children_array, array('class' => 'tax_tax_tax', 'value' => $customfield_val, 'data-id' => $id, 'data-taxonomy' => $customfield['taxonomy'] ));
+            $select = new Element_Select('', 'tax_tax_tax[sub][]', $term_children_array, array('class' => 'tax_tax_tax', 'value' => $customfield_val, 'data-id' => $customfield['slug'], 'data-taxonomy' => $customfield['taxonomy'] ));
             ob_start();
               $select->render();
             $select = ob_get_clean();
@@ -145,6 +148,7 @@ function buddyforms_afe_admin_settings_sidebar_metabox_html(){
  }
  add_filter('buddyforms_create_edit_form_display_element','buddyforms_afe_create_frontend_element',1,2);
 
+// Ajax load new child select
 function bf_afe_fields_group_create_frontend_form_element_ajax(){
   if(!isset($_POST['data'])){
     echo 'false';
@@ -170,7 +174,7 @@ if(is_array($cats)){
 
     $childs_of_cat_array = false;
     if(is_array($childs_of_cat)) :
-      $childs_of_cat_array[none] = 'Select One';
+      $childs_of_cat_array['none'] = 'Select One';
       foreach($childs_of_cat as $key => $child_of_cat){
         if($child_of_cat->parent == $cat)
           $childs_of_cat_array[$child_of_cat->term_taxonomy_id] = $child_of_cat->name;
@@ -188,12 +192,18 @@ if(is_array($cats)){
 }
 die();
 }
-
 add_action('wp_ajax_bf_afe_fields_group_create_frontend_form_element_ajax', 'bf_afe_fields_group_create_frontend_form_element_ajax');
 
+// Save the taxonomies
 function buddyforms_afe_update_post_meta($customfield, $post_id){
 
   if( $customfield['type'] != 'tax-afe' )
+    return;
+
+  if(!isset($_POST[$customfield['slug']]))
+    return;
+
+  if($_POST[$customfield['slug']] == 'none')
     return;
 
   $taxonomy = get_taxonomy($customfield['taxonomy']);

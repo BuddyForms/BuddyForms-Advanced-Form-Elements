@@ -1,7 +1,5 @@
 jQuery(document).ready(function (){
 
-
-
   jQuery(document).on( "change", '.tax_tax_tax', function( evt ) {
 
     var id = jQuery(this).attr('data-id');

@@ -181,8 +181,13 @@ if(is_array($cats)){
       }
     endif;
 
+    $select_value = false;
+    if(isset($cats[$cat_key+1])){
+      $select_value = $cats[$cat_key+1];
+    }
+
     if(is_array($childs_of_cat_array)){
-      $select = new Element_Select('Test ', 'tax_tax_tax', $childs_of_cat_array, array('class' => 'tax_tax_tax', 'value' => $cats[$cat_key+1], 'data-id' => $id, 'data-taxonomy' => $taxonomy ));
+      $select = new Element_Select('Test ', 'tax_tax_tax', $childs_of_cat_array, array('class' => 'tax_tax_tax', 'value' => $select_value, 'data-id' => $id, 'data-taxonomy' => $taxonomy ));
     }
 
     if(is_object($select)) {
@@ -205,6 +210,11 @@ function buddyforms_afe_update_post_meta($customfield, $post_id){
 
   if($_POST[$customfield['slug']] == 'none')
     return;
+
+  if(!isset($customfield['taxonomy']))
+    return;
+
+  wp_delete_object_term_relationships($post_id, $customfield['taxonomy']);
 
   $taxonomy = get_taxonomy($customfield['taxonomy']);
 

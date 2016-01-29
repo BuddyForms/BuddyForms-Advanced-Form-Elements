@@ -62,8 +62,11 @@ function buddyforms_afe_admin_settings_sidebar_metabox_html(){
 
          case 'tax-afe':
          $taxonomies = buddyforms_taxonomies($buddyform);
-         $taxonomy = isset($customfield['taxonomy']) ? $customfield['taxonomy'] : false;
-         $form_fields['general']['taxonomy']        = new Element_Select('<b>' . __('Taxonomy', 'buddyforms') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][taxonomy]", $taxonomies, array('value' => $taxonomy, 'class' => 'bf_tax_select', 'id' => $field_id));
+
+         $taxonomy = false;
+         if (isset($buddyform['form_fields'][$field_id]['taxonomy']))
+             $taxonomy = $buddyform['form_fields'][$field_id]['taxonomy'];
+         $form_fields['general']['taxonomy'] = new Element_Select('<b>' . __('Taxonomy', 'buddyforms') . '</b>', "buddyforms_options[form_fields][" . $field_id . "][taxonomy]", $taxonomies, array('value' => $taxonomy, 'class' => 'bf_tax_select', 'id' => $field_id));
          break;
 
      }

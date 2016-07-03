@@ -29,27 +29,28 @@
  */
 
 
-add_action( 'buddyforms_front_js_css_enqueue', 'buddyforms_afe_front_js_css_enqueue' );
-
 function buddyforms_afe_front_js_css_enqueue() {
 	wp_enqueue_script( 'bf-afe-js', plugins_url( 'assets/js/ajax.js', __FILE__ ), array( 'jquery' ) );
 }
+add_action( 'buddyforms_front_js_css_enqueue', 'buddyforms_afe_front_js_css_enqueue' );
 
-function buddyforms_afe_admin_settings_sidebar_metabox() {
-	add_meta_box( 'buddyforms_afe', __( "Advanced Form Elements", 'buddyforms' ), 'buddyforms_afe_admin_settings_sidebar_metabox_html', 'buddyforms', 'side', 'low' );
-}
-
-add_filter( 'add_meta_boxes', 'buddyforms_afe_admin_settings_sidebar_metabox' );
-
-function buddyforms_afe_admin_settings_sidebar_metabox_html() {
-	global $post, $buddyforms;
+function buddyforms_afe_admin_settings_sidebar_metabox( $elements_select_options ) {
+	global $post;
 
 	if ( $post->post_type != 'buddyforms' ) {
 		return;
 	}
 
-	echo '<b>Taxonomy Hierarchically</b><p><a href="#" data-fieldtype="tax-afe" class="bf_add_element_action">Taxonomy</a></p>';
+	$elements_select_options['Taxonomy Hierarchically'] = array(
+		'tax-afe' => array(
+			'label'     => __( 'Taxonomy Hierarchically', 'buddyforms' ),
+			'unique'    => 'unique'
+		)
+	);
+
+	return $elements_select_options;
 }
+add_filter( 'buddyforms_add_form_element_to_select', 'buddyforms_afe_admin_settings_sidebar_metabox' );
 
 /*
  * Create the new Form Builder Form Element for teh AFE Field Groups
@@ -80,7 +81,6 @@ function buddyforms_afe_create_new_form_builder_form_element( $form_fields, $for
 
 	return $form_fields;
 }
-
 add_filter( 'buddyforms_form_element_add_field', 'buddyforms_afe_create_new_form_builder_form_element', 1, 5 );
 
 /*
@@ -170,7 +170,6 @@ function buddyforms_afe_create_frontend_element( $form, $form_args ) {
 
 	return $form;
 }
-
 add_filter( 'buddyforms_create_edit_form_display_element', 'buddyforms_afe_create_frontend_element', 1, 2 );
 
 // Ajax load new child select
@@ -228,7 +227,6 @@ function bf_afe_fields_group_create_frontend_form_element_ajax() {
 	}
 	die();
 }
-
 add_action( 'wp_ajax_bf_afe_fields_group_create_frontend_form_element_ajax', 'bf_afe_fields_group_create_frontend_form_element_ajax' );
 
 // Save the taxonomies
@@ -337,5 +335,4 @@ function buddyforms_afe_update_post_meta( $customfield, $post_id ) {
 	}
 
 }
-
 add_action( 'buddyforms_update_post_meta', 'buddyforms_afe_update_post_meta', 10, 2 );

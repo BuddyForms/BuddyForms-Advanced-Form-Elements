@@ -41,17 +41,16 @@ function buddyforms_afe_admin_settings_sidebar_metabox( $elements_select_options
 		return;
 	}
 
-	$elements_select_options['Taxonomy Hierarchically'] = array(
-		'tax-afe' => array(
-			'label'     => __( 'Taxonomy Hierarchically', 'buddyforms' ),
-			'unique'    => 'unique'
-		)
+	$elements_select_options['afe']['label'] = 'Advanced Form Elements';
+	$elements_select_options['afe']['class'] = 'bf_show_if_f_type_post';
+	$elements_select_options['afe']['fields']['tax-afe'] = array(
+		'label'     => __( 'Taxonomy Hierarchical', 'buddyforms' ),
+		'unique'    => 'unique'
 	);
 
 	return $elements_select_options;
 }
-add_filter( 'buddyforms_add_form_element_to_select', 'buddyforms_afe_admin_settings_sidebar_metabox' );
-
+add_filter( 'buddyforms_add_form_element_select_option', 'buddyforms_afe_admin_settings_sidebar_metabox', 1, 2 );
 /*
  * Create the new Form Builder Form Element for teh AFE Field Groups
  *

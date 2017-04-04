@@ -4,8 +4,8 @@
  Plugin URI: http://buddyforms.com/downloads/buddyforms-advanced-form-elements/
  Description: Add some advanced form ellements to BuddyForms
  Version: 0.1
- Author: Sven Lehnert
- Author URI: https://profiles.wordpress.org/svenl77
+ Author: ThemeKraft
+ Author URI: https://themekraft.com/buddyforms/
  License: GPLv2 or later
  Network: false
 
